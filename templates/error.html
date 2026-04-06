@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Not Allowed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Lato',sans-serif; background:#f0eef8; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+        .card { background:white; border-radius:20px; box-shadow:0 8px 40px rgba(44,32,64,0.13); padding:48px 44px; max-width:440px; width:100%; text-align:center; }
+        h2 { font-family:'Playfair Display',serif; font-size:1.6rem; color:#b91c1c; margin-bottom:12px; }
+        p { color:#666; font-size:14px; line-height:1.6; margin-bottom:28px; }
+        .btn { display:inline-block; padding:12px 28px; border-radius:8px; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-decoration:none; background:linear-gradient(135deg,#2c3e7a,#4a6fa5); color:white; transition:opacity .2s; }
+        .btn:hover { opacity:.85; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div style="font-size:48px; margin-bottom:16px;">🚫</div>
+    <h2>Not Allowed</h2>
+    <p>{{ message }}</p>
+    <a href="{% url 'base' %}" class="btn">Go Home</a>
+</div>
+</body>
+</html>

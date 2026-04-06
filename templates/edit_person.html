@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit {{ person.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Lato',sans-serif; background:#f0eef8; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+        .card { background:white; border-radius:20px; box-shadow:0 8px 40px rgba(44,32,64,0.13); padding:48px 44px; max-width:480px; width:100%; }
+        h2 { font-family:'Playfair Display',serif; font-size:1.6rem; color:#2c2040; margin-bottom:28px; }
+        .form-group { margin-bottom:20px; }
+        label { display:block; font-size:12px; font-weight:700; color:#555; letter-spacing:.8px; text-transform:uppercase; margin-bottom:7px; }
+        input, textarea { width:100%; padding:12px 14px; border:2px solid #ede9f5; border-radius:9px; font-size:14px; font-family:'Lato',sans-serif; color:#2c2040; outline:none; transition:border-color .2s; }
+        input:focus, textarea:focus { border-color:#4a6fa5; }
+        textarea { resize:vertical; }
+        .btn { display:inline-block; padding:12px 28px; border-radius:8px; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; transition:opacity .2s; margin-right:10px; margin-top:8px; }
+        .btn-primary { background:linear-gradient(135deg,#2c3e7a,#4a6fa5); color:white; }
+        .btn-outline { background:white; color:#4a6fa5; border:2px solid #4a6fa5; }
+        .btn:hover { opacity:.85; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Edit {{ person.name }}</h2>
+    <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label>Name</label>
+        <input type="text" name="name" value="{{ person.name }}" required>
+    </div>
+
+    <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" name="birth_date" value="{{ person.birth_date|date:'Y-m-d' }}">
+    </div>
+
+    <div class="form-group">
+        <label>Father</label>
+        <select name="father">
+            <option value="">— No Father —</option>
+            {% for male in males %}
+                <option value="{{ male.id }}"
+                    {% if person.father and person.father.pk == male.pk %}selected{% endif %}>
+                    {{ male.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Mother</label>
+        <select name="mother">
+            <option value="">— No Mother —</option>
+            {% for female in females %}
+                <option value="{{ female.id }}"
+                    {% if person.mother and person.mother.pk == female.pk %}selected{% endif %}>
+                    {{ female.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Bio</label>
+        <textarea name="bio" rows="4">{{ person.bio }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="{% url 'person_detail' person.pk %}" class="btn btn-outline">Cancel</a>
+</form>
+</div>
+</body>
+</html>

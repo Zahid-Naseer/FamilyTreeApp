@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --male: linear-gradient(135deg,#2c3e7a,#4a6fa5); --bg: #f0eef8; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 600px; margin: 0 auto 36px; flex-wrap: wrap; gap: 12px;
+        }
+
+        .btn {
+            display: inline-block; padding: 9px 20px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; text-decoration: none; cursor: pointer;
+            border: none; transition: opacity .2s, transform .15s;
+        }
+        .btn:hover { opacity:.85; transform:translateY(-1px); }
+        .btn-primary { background: var(--male); color: white; }
+        .btn-outline  { background: white; color: #4a6fa5; border: 2px solid #4a6fa5; }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; color: #2c2040;
+            text-align: center; margin-bottom: 32px;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; }
+
+        /* User identity card at top */
+        .identity-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.09);
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .identity-avatar {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--male);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(44,62,122,0.25);
+        }
+        .identity-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; color: #2c2040; margin-bottom: 4px;
+        }
+        .identity-info p {
+            font-size: 13px; color: #9a8faa; font-weight: 300;
+        }
+        .identity-info .has-profile {
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-top: 6px; font-size: 12px; font-weight: 600;
+            color: #4a6fa5;
+        }
+
+        /* Section cards */
+        .section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.08);
+            padding: 28px 32px;
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem; color: #2c2040;
+            margin-bottom: 22px; padding-bottom: 10px;
+            border-bottom: 2px solid #f0eef8;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block; font-size: 12px; font-weight: 700;
+            color: #555; letter-spacing: .8px;
+            text-transform: uppercase; margin-bottom: 7px;
+        }
+        input {
+            width: 100%; padding: 12px 14px;
+            border: 2px solid #ede9f5; border-radius: 9px;
+            font-size: 14px; font-family: 'Lato', sans-serif;
+            color: #2c2040; outline: none; transition: border-color .2s;
+        }
+        input:focus { border-color: #4a6fa5; }
+
+        .alert {
+            padding: 12px 16px; border-radius: 9px;
+            font-size: 13px; font-weight: 600; margin-bottom: 20px;
+        }
+        .alert-success { background:#f0fdf4; border:1px solid #86efac; color:#166534; }
+        .alert-error   { background:#fef2f2; border:1px solid #fca5a5; color:#b91c1c; }
+
+        .submit-btn {
+            width: 100%; padding: 13px; border: none; border-radius: 9px;
+            font-size: 14px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; cursor: pointer;
+            background: var(--male); color: white;
+            transition: opacity .2s; margin-top: 4px;
+        }
+        .submit-btn:hover { opacity: .88; }
+
+        .hint {
+            font-size: 12px; color: #b0a8c0;
+            margin-top: 6px; font-weight: 300;
+        }
+
+        /* Linked person card */
+        .linked-card {
+            background: #f0eef8;
+            border: 2px solid #d0c8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .linked-card .linked-name {
+            font-weight: 700; font-size: 15px; color: #2c2040;
+        }
+        .linked-card .linked-sub {
+            font-size: 12px; color: #9a8faa; margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="{% url 'base' %}" class="btn btn-outline">← Home</a>
+    <a href="{% url 'logout' %}" class="btn btn-primary">Sign Out</a>
+</div>
+
+<h1 class="page-title">Account Settings</h1>
+
+<div class="container">
+
+    {% if success %}
+        <div class="alert alert-success">✅ {{ success }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <!-- Identity card -->
+    <div class="identity-card">
+        <div class="identity-avatar">👤</div>
+        <div class="identity-info">
+            <h2>{{ request.user.username }}</h2>
+            <p>{{ request.user.email|default:"No email set" }}</p>
+            {% if request.user.person_profile %}
+                <span class="has-profile">
+                    🌳 Linked to
+                    <a href="{% url 'account_settings' %}"
+                       style="color:#2c3e7a; text-decoration:none; font-weight:700;">
+                        {{ request.user.person_profile.name }}
+                    </a>
+                    in the family tree
+                </span>
+            {% else %}
+                <span style="font-size:12px; color:#c0b8d0; margin-top:6px; display:block;">
+                    Not linked to any person in the tree yet
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Update username & email -->
+    <div class="section">
+        <h3>✏️ Update Details</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_info">
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" value="{{ request.user.username }}" required>
+            </div>
+
+           
+            <button type="submit" class="submit-btn">Save Details</button>
+        </form>
+    </div>
+
+    <!-- Change password -->
+    <div class="section">
+        <h3>🔒 Change Password</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="change_password">
+
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" name="current_password" required>
+            </div>
+
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" name="new_password" required>
+                <p class="hint">Minimum 6 characters.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" name="confirm_password" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Change Password</button>
+        </form>
+    </div>
+
+    <!-- Linked tree person -->
+    {% if request.user.person_profile %}
+    <div class="section">
+        <h3>🌳 Your Family Tree Profile</h3>
+        <div class="linked-card">
+            <div>
+                <div class="linked-name">{{ request.user.person_profile.name }}</div>
+                <div class="linked-sub">
+                    {% if request.user.person_profile.birth_date %}
+                        🎂 {{ request.user.person_profile.birth_date|date:"d M Y" }}
+                    {% else %}
+                        No birth date recorded
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{% url 'editPerson' request.user.person_profile.pk %}" class="btn btn-outline">
+                ✏️ Edit Tree Profile
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>

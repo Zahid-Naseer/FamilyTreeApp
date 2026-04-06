@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Marriage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --male: linear-gradient(135deg,#2c3e7a,#4a6fa5); --bg: #f0eef8; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Lato', sans-serif; background: var(--bg);
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; padding: 40px 20px;
+        }
+        .card {
+            background: white; border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(44,32,64,0.13);
+            padding: 44px 40px; max-width: 440px; width: 100%;
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; color: #2c2040; margin-bottom: 6px;
+        }
+        .sub { font-size: 13px; color: #9a8faa; margin-bottom: 28px; }
+        .names {
+            font-weight: 700; color: #2c3e7a;
+        }
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block; font-size: 11px; font-weight: 700;
+            color: #555; letter-spacing: .8px;
+            text-transform: uppercase; margin-bottom: 7px;
+        }
+        input {
+            width: 100%; padding: 12px 14px;
+            border: 2px solid #ede9f5; border-radius: 9px;
+            font-size: 14px; font-family: 'Lato', sans-serif;
+            color: #2c2040; outline: none; transition: border-color .2s;
+        }
+        input:focus { border-color: #4a6fa5; }
+        .btn {
+            display: inline-block; padding: 12px 24px; border-radius: 9px;
+            font-size: 13px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; text-decoration: none;
+            cursor: pointer; border: none; transition: opacity .2s; margin-right: 10px;
+        }
+        .btn:hover { opacity: .85; }
+        .btn-primary { background: var(--male); color: white; }
+        .btn-outline { background: white; color: #4a6fa5; border: 2px solid #4a6fa5; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div style="font-size:40px; margin-bottom:14px;">💍</div>
+    <h2>Edit Marriage</h2>
+    <p class="sub">
+        <span class="names">{{ marriage.spouse1.name }}</span>
+        &nbsp;❤️&nbsp;
+        <span class="names">{{ marriage.spouse2.name }}</span>
+    </p>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Marriage Date</label>
+            <input type="date" name="marriage_date"
+                   value="{{ marriage.marriage_date|date:'Y-m-d' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'marriages_list' %}" class="btn btn-outline">Cancel</a>
+    </form>
+</div>
+</body>
+</html>

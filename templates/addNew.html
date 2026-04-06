@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Member</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+       .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        button, a.btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        .back-home {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-home .btn {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-card">
+    <h2>Add New Member</h2>
+
+    {% if success %}
+        <div class="alert alert-success">✅ {{ person.name }} added successfully!</div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'addNew' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fatherSelect">Father</label>
+            <select id="fatherSelect" name="father">
+                <option value="">— No Father —</option>
+                {% for male in males %}
+                    <option value="{{ male.id }}"
+                        data-wives="{% for m in male.marriages_as_spouse1.all %}{{ m.spouse2.id }},{{ m.spouse2.name }};{% endfor %}{% for m in male.marriages_as_spouse2.all %}{{ m.spouse1.id }},{{ m.spouse1.name }};{% endfor %}">
+                        {{ male.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Existing mother dropdown (shown when father has wives) -->
+        <div class="form-group" id="motherGroup">
+            <label for="motherSelect">Mother</label>
+            <select id="motherSelect" name="mother">
+                <option value="">— No Mother —</option>
+                {% for female in females %}
+                    <option value="{{ female.id }}">{{ female.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- New mother full details (shown when father has no wife) -->
+        <div id="newMotherGroup" style="display:none;">
+            <div style="background:#f8f6fc; border:2px solid #d0c8f0; border-radius:12px; padding:20px; margin-bottom:18px;">
+
+                <div style="font-size:13px; font-weight:700; color:#4a6fa5; margin-bottom:16px; letter-spacing:.5px;">
+                    👩 Add Mother's Details
+                    <span style="font-weight:300; color:#9a8faa; font-size:11px; margin-left:8px;">
+                        — she will be auto-married to father
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label>Mother's Name</label>
+                    <input type="text" id="motherNameInput" name="mother_name"
+                           placeholder="Enter mother's full name">
+                </div>
+
+                <div class="form-group">
+                    <label>Mother's Date of Birth</label>
+                    <input type="date" name="mother_birth_date">
+                </div>
+
+                <div class="form-group">
+                    <label>Mother's Bio</label>
+                    <textarea name="mother_bio" rows="2"
+                              placeholder="Brief bio (optional)"></textarea>
+                </div>
+
+                <div style="border-top:2px solid #e8e0f8; margin:16px 0;"></div>
+
+                <div style="font-size:13px; font-weight:700; color:#4a6fa5; margin-bottom:12px;">
+                    💍 Marriage Details
+                </div>
+
+                <div class="form-group">
+                    <label>Marriage Date</label>
+                    <input type="date" name="marriage_date">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="birth_date">Date of Birth</label>
+            <input type="date" id="birth_date" name="birth_date">
+        </div>
+
+        <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea id="bio" name="bio" rows="3"></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                <input type="checkbox" name="joined_by_marriage">
+                Joined family by marriage (no parents in this tree)
+            </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                <input type="checkbox" name="is_me">
+                This person is me (Check if only you want to change person's data)
+            </label>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn-primary">Add Member</button>
+            <a href="{% url 'addNew' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+
+        <div class="back-home">
+            <a href="{% url 'treeView' %}" style="padding-bottom:12px;"
+               class="btn btn-primary">View Family Tree</a>
+            <a href="{% url 'base' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </form>
+</div>
+</div>
+
+<script>
+const fatherSelect    = document.getElementById('fatherSelect');
+const motherSelect    = document.getElementById('motherSelect');
+const motherGroup     = document.getElementById('motherGroup');
+const newMotherGroup  = document.getElementById('newMotherGroup');
+const motherNameInput = document.getElementById('motherNameInput');
+
+// Store all original female options
+const allFemaleOptions = [...motherSelect.options].slice(1);
+
+fatherSelect.addEventListener('change', function () {
+    const selected = this.options[this.selectedIndex];
+    const wivesRaw = selected.dataset.wives || '';
+
+    // Reset both fields
+    motherSelect.innerHTML = '<option value="">— No Mother —</option>';
+    motherNameInput.value  = '';
+
+    if (!this.value) {
+        // No father selected — show all females in dropdown
+        allFemaleOptions.forEach(o => motherSelect.appendChild(o.cloneNode(true)));
+        motherGroup.style.display    = '';
+        newMotherGroup.style.display = 'none';
+        return;
+    }
+
+    if (wivesRaw.trim()) {
+        // Father has wives — show only his wives
+        const wives = wivesRaw.split(';').filter(Boolean).map(w => {
+            const parts = w.split(',');
+            return { id: parts[0], name: parts[1] };
+        });
+        wives.forEach(w => {
+            const opt       = document.createElement('option');
+            opt.value       = w.id;
+            opt.textContent = w.name;
+            motherSelect.appendChild(opt);
+        });
+        motherGroup.style.display    = '';
+        newMotherGroup.style.display = 'none';
+    } else {
+        // Father has no wife — hide dropdown, show full mother form
+        motherGroup.style.display    = 'none';
+        newMotherGroup.style.display = '';
+    }
+});
+</script>
+</body>
+</html>

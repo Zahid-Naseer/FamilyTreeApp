@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Marriage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #f0eef8; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Lato', sans-serif; background: var(--bg);
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; padding: 40px 20px;
+        }
+        .card {
+            background: white; border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(44,32,64,0.13);
+            padding: 44px 40px; max-width: 440px; width: 100%; text-align: center;
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; color: #b91c1c; margin-bottom: 10px;
+        }
+        p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 28px; }
+        strong { color: #2c2040; }
+        .btn {
+            display: inline-block; padding: 12px 24px; border-radius: 9px;
+            font-size: 13px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; text-decoration: none;
+            cursor: pointer; border: none; transition: opacity .2s; margin: 6px;
+        }
+        .btn:hover { opacity: .85; }
+        .btn-danger  { background: linear-gradient(135deg,#7a2c2c,#c05050); color: white; }
+        .btn-outline { background: white; color: #4a6fa5; border: 2px solid #4a6fa5; }
+        .warning {
+            background: #fff5f5; border: 1px solid #fca5a5;
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 13px; color: #b91c1c; margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div style="font-size:48px; margin-bottom:16px;">💔</div>
+    <h2>Delete Marriage?</h2>
+    <p>
+        You are about to delete the marriage record between
+        <strong>{{ marriage.spouse1.name }}</strong> and
+        <strong>{{ marriage.spouse2.name }}</strong>.
+    </p>
+    <div class="warning">
+        ⚠️ This will not delete the persons — only the marriage record.
+        Their children will keep their parent links.
+    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'marriages_list' %}" class="btn btn-outline">Cancel</a>
+    </form>
+</div>
+</body>
+</html>

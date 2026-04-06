@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Members</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --male:   linear-gradient(135deg, #2c3e7a, #4a6fa5);
+            --female: linear-gradient(135deg, #7a2c5a, #c06090);
+            --bg:     #f0eef8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 960px; margin: 0 auto 36px;
+            flex-wrap: wrap; gap: 12px;
+        }
+
+        .btn {
+            display: inline-block; padding: 9px 20px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; text-decoration: none;
+            transition: opacity .2s, transform .15s; border: none; cursor: pointer;
+        }
+        .btn:hover { opacity:.85; transform:translateY(-1px); }
+        .btn-primary { background: var(--male); color: white; }
+        .btn-outline  { background: white; color: #4a6fa5; border: 2px solid #4a6fa5; }
+        .btn-danger   { background: linear-gradient(135deg,#7a2c2c,#c05050); color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 11px; }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center; font-size: 2rem;
+            color: #2c2040; margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center; color: #9a8faa; font-size: 12px;
+            margin-bottom: 32px; font-weight: 300;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        /* Stats row */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: white; border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(44,32,64,0.08);
+            padding: 22px; text-align: center;
+        }
+        .stat-card .num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; color: #2c3e7a; font-weight: 700;
+        }
+        .stat-card .label {
+            font-size: 11px; color: #9a8faa; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase; margin-top: 4px;
+        }
+
+        /* Search & filter bar */
+        .filter-bar {
+            background: white; border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(44,32,64,0.08);
+            padding: 18px 24px;
+            margin-bottom: 20px;
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-bar input {
+            flex: 1; min-width: 200px;
+            padding: 10px 14px; border: 2px solid #ede9f5;
+            border-radius: 8px; font-size: 14px;
+            font-family: 'Lato', sans-serif; outline: none;
+            transition: border-color .2s;
+        }
+        .filter-bar input:focus { border-color: #4a6fa5; }
+        .filter-bar select {
+            padding: 10px 14px; border: 2px solid #ede9f5;
+            border-radius: 8px; font-size: 13px;
+            font-family: 'Lato', sans-serif; outline: none;
+            background: white; cursor: pointer;
+        }
+
+        /* Members table */
+        .table-wrap {
+            background: white; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.08);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%; border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #2c3e7a, #4a6fa5);
+            color: white;
+        }
+        thead th {
+            padding: 14px 18px; text-align: left;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0eef8;
+            transition: background .15s;
+        }
+        tbody tr:hover { background: #faf9fd; }
+        tbody tr:last-child { border-bottom: none; }
+
+        td {
+            padding: 14px 18px; font-size: 13px; color: #333;
+            vertical-align: middle;
+        }
+
+        /* Gender badge */
+        .badge {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 20px; font-size: 11px; font-weight: 700;
+            letter-spacing: .5px;
+        }
+        .badge-male   { background: #dbeafe; color: #1e40af; }
+        .badge-female { background: #fce7f3; color: #9d174d; }
+        .badge-unknown{ background: #f3f4f6; color: #555; }
+
+        /* Claimed dot */
+        .active-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #4ade80; display: inline-block;
+            margin-right: 5px;
+        }
+        .inactive-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #d1d5db; display: inline-block;
+            margin-right: 5px;
+        }
+
+        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        .empty-state {
+            text-align: center; color: #aaa;
+            font-size: 15px; padding: 60px 20px;
+        }
+
+        /* Mobile: hide some columns */
+        @media (max-width: 640px) {
+            .hide-mobile { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="{% url 'base' %}" class="btn btn-outline">← Home</a>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="{% url 'export_excel' %}" class="btn btn-outline">
+            📊 Export Excel
+        </a>
+        <a href="{% url 'export_pdf' %}" class="btn btn-outline">
+            📄 Export PDF
+        </a>
+        <a href="{% url 'addNew' %}" class="btn btn-primary">➕ Add Member</a>
+    </div>
+</div>
+
+<h1>{{ family.name }}</h1>
+<p class="subtitle">All Family Members</p>
+
+<div class="container">
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="num">{{ total }}</div>
+            <div class="label">Total</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ males }}</div>
+            <div class="label">Males</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ females }}</div>
+            <div class="label">Females</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ married }}</div>
+            <div class="label">Marriages</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ active }}</div>
+            <div class="label">On Platform</div>
+        </div>
+    </div>
+
+    <!-- Search & filter -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="🔍  Search by name...">
+        <select id="genderFilter">
+            <option value="">All Genders</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+        <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="active">On Platform</option>
+            <option value="inactive">Not on Platform</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <table id="membersTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th class="hide-mobile">Father</th>
+                    <th class="hide-mobile">Mother</th>
+                    <th class="hide-mobile">Birth Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in persons %}
+                <tr class="member-row"
+                    data-name="{{ person.name|lower }}"
+                    data-gender="{% if person.gender == 'M' %}male{% elif person.gender == 'F' %}female{% else %}unknown{% endif %}"
+                    data-status="{% if person.claimed_by %}active{% else %}inactive{% endif %}">
+
+                    <td style="color:#9a8faa; font-weight:300;">{{ forloop.counter }}</td>
+
+                    <td>
+                        <strong>{{ person.name }}</strong>
+                        {% if person.claimed_by == request.user %}
+                            <span style="font-size:10px; color:#4a6fa5; font-weight:700; margin-left:4px;">YOU</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if person.gender == 'M' %}
+                            <span class="badge badge-male">♂ Male</span>
+                        {% elif person.gender == 'F' %}
+                            <span class="badge badge-female">♀ Female</span>
+                        {% else %}
+                            <span class="badge badge-unknown">Unknown</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="hide-mobile">
+                        {% if person.father %}
+                            <a href="{% url 'person_detail' person.father.pk %}"
+                               style="color:#2c3e7a; text-decoration:none; font-weight:600;">
+                                {{ person.father.name }}
+                            </a>
+                        {% else %}
+                            <span style="color:#d1d5db;">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="hide-mobile">
+                        {% if person.mother %}
+                            <a href="{% url 'person_detail' person.mother.pk %}"
+                               style="color:#7a2c5a; text-decoration:none; font-weight:600;">
+                                {{ person.mother.name }}
+                            </a>
+                        {% else %}
+                            <span style="color:#d1d5db;">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="hide-mobile">
+                        {% if person.birth_date %}
+                            {{ person.birth_date|date:"d M Y" }}
+                        {% else %}
+                            <span style="color:#d1d5db;">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if person.claimed_by %}
+                            <span class="active-dot"></span>
+                            <span style="font-size:12px; color:#16a34a; font-weight:600;">
+                                {{ person.claimed_by.username }}
+                            </span>
+                        {% else %}
+                            <span class="inactive-dot"></span>
+                            <span style="font-size:12px; color:#9a8faa;">Not linked</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="actions">
+                            <a href="{% url 'person_detail' person.pk %}"
+                               class="btn btn-outline btn-sm">View</a>
+                            {% if is_admin and not person.claimed_by or person.claimed_by == request.user %}
+                                <a href="{% url 'editPerson' person.pk %}"
+                                   class="btn btn-outline btn-sm">Edit</a>
+                            {% endif %}
+                            {% if is_admin and not person.claimed_by %}
+                                <a href="{% url 'deletePerson' person.pk %}"
+                                   class="btn btn-danger btn-sm">Del</a>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">No family members yet.</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    {% if orphans %}
+<div class="section" style="border: 2px solid #fcd34d; margin-top: 28px;">
+    <h3 style="color:#92400e;">
+        ⚠️ Unlinked Members
+        <span style="font-size:12px; font-weight:400; color:#b45309; margin-left:8px;">
+            — these persons have no parents assigned
+        </span>
+    </h3>
+    <p style="font-size:13px; color:#92400e; margin-bottom:16px;">
+        These members are not visible in the family tree. Use the Re-link button to assign them a father or mother.
+    </p>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for orphan in orphans %}
+        <div style="display:flex; align-items:center; justify-content:space-between;
+                    background:#fefce8; border:1px solid #fcd34d; border-radius:10px;
+                    padding:12px 16px; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:36px; height:36px; border-radius:50%;
+                            background:{% if orphan.gender == 'M' %}linear-gradient(135deg,#2c3e7a,#4a6fa5){% elif orphan.gender == 'F' %}linear-gradient(135deg,#7a2c5a,#c06090){% else %}linear-gradient(135deg,#555,#888){% endif %};
+                            display:flex; align-items:center; justify-content:center;
+                            font-size:16px; color:white; font-weight:700; flex-shrink:0;">
+                    {% if orphan.gender == 'M' %}♂{% elif orphan.gender == 'F' %}♀{% else %}?{% endif %}
+                </div>
+                <div>
+                    <div style="font-weight:700; font-size:14px; color:#2c2040;">
+                        {{ orphan.name }}
+                    </div>
+                    <div style="font-size:12px; color:#9a8faa;">
+                        {% if orphan.birth_date %}🎂 {{ orphan.birth_date|date:"d M Y" }}{% else %}No birth date{% endif %}
+                        &nbsp;·&nbsp;
+                        {% if orphan.claimed_by %}
+                            <span style="color:#16a34a;">● {{ orphan.claimed_by.username }}</span>
+                        {% else %}
+                            Not claimed
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <a href="{% url 'person_detail' orphan.pk %}"
+                   class="btn btn-outline btn-sm">View</a>
+                <a href="{% url 'editPerson' orphan.pk %}"
+                   class="btn btn-sm"
+                   style="background:linear-gradient(135deg,#92400e,#d97706); color:white;">
+                    🔗 Re-link
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+</div>
+
+<script>
+    // Live search + filter
+    const searchInput  = document.getElementById('searchInput');
+    const genderFilter = document.getElementById('genderFilter');
+    const statusFilter = document.getElementById('statusFilter');
+
+    function filterTable() {
+        const search = searchInput.value.toLowerCase();
+        const gender = genderFilter.value;
+        const status = statusFilter.value;
+
+        document.querySelectorAll('.member-row').forEach(row => {
+            const nameMatch   = row.dataset.name.includes(search);
+            const genderMatch = !gender || row.dataset.gender === gender;
+            const statusMatch = !status || row.dataset.status === status;
+            row.style.display = (nameMatch && genderMatch && statusMatch) ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    genderFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+</script>
+
+</body>
+</html>

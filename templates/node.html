@@ -1,0 +1,55 @@
+{% if node %}
+<div class="node">
+
+    <div class="couple-row">
+
+        <!-- Main person -->
+        <div class="person-wrap">
+            <a href="{% url 'person_detail' node.person.pk %}"
+               class="person-box {% if node.person.gender == 'M' %}male{% elif node.person.gender == 'F' %}female{% else %}unknown{% endif %}">
+                {{ node.person.name }}
+            </a>
+            {% if node.person.gender == 'M' %}
+                <button class="add-child-btn"
+                    data-mode="father"
+                    data-parent-id="{{ node.person.pk }}"
+                    data-parent-name="{{ node.person.name }}"
+                    data-spouses="{% for m in node.person.marriages_as_spouse1.all %}{{ m.spouse2.id }},{{ m.spouse2.name }};{% endfor %}{% for m in node.person.marriages_as_spouse2.all %}{{ m.spouse1.id }},{{ m.spouse1.name }};{% endfor %}"
+                    data-avail-females="{% for f in node.person.family.persons.all %}{% if f.gender == 'F' and not f.marriages_as_spouse1.exists and not f.marriages_as_spouse2.exists %}{{ f.id }},{{ f.name }};{% endif %}{% endfor %}"
+                    onclick="openAddChildModal(this)"
+                    title="Add child">+</button>
+            {% elif node.person.gender == 'F' %}
+                <button class="add-child-btn"
+                    data-mode="mother"
+                    data-parent-id="{{ node.person.pk }}"
+                    data-parent-name="{{ node.person.name }}"
+                    data-spouses="{% for m in node.person.marriages_as_spouse1.all %}{{ m.spouse2.id }},{{ m.spouse2.name }};{% endfor %}{% for m in node.person.marriages_as_spouse2.all %}{{ m.spouse1.id }},{{ m.spouse1.name }};{% endfor %}"
+                    data-avail-males="{% for m in node.person.family.persons.all %}{% if m.gender == 'M' and not m.marriages_as_spouse1.exists and not m.marriages_as_spouse2.exists %}{{ m.id }},{{ m.name }};{% endif %}{% endfor %}"
+                    onclick="openAddChildModal(this)"
+                    title="Add child">+</button>
+            {% endif %}
+        </div>
+
+        <!-- Spouses -->
+        {% for spouse in node.spouses %}
+            <div class="connector-heart">❤️</div>
+            <div class="person-wrap">
+                <a href="{% url 'person_detail' spouse.pk %}"
+                   class="person-box {% if spouse.gender == 'M' %}male{% elif spouse.gender == 'F' %}female{% else %}unknown{% endif %}">
+                    {{ spouse.name }}
+                </a>
+            </div>
+        {% endfor %}
+
+    </div>
+
+    {% if node.children %}
+        <div class="children">
+            {% for child in node.children %}
+                {% include "node.html" with node=child %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endif %}

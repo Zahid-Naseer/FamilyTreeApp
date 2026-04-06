@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilyTree — Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --male:   linear-gradient(135deg, #2c3e7a, #4a6fa5);
+            --female: linear-gradient(135deg, #7a2c5a, #c06090);
+            --bg:     #f0eef8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        /* ── top nav ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto 48px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: #2c2040;
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-chip {
+            background: white;
+            border: 2px solid #ede9f5;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: opacity .2s, transform .15s;
+        }
+        .btn:hover { opacity: .88; transform: translateY(-1px); }
+        .btn-primary   { background: var(--male); color: white; }
+        .btn-secondary { background: white; color: #4a6fa5; border: 2px solid #4a6fa5; }
+        .btn-danger    { background: linear-gradient(135deg,#7a2c2c,#b05050); color: white; }
+
+        /* ── main content ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .welcome h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: #2c2040;
+            margin-bottom: 8px;
+        }
+        .welcome p {
+            color: #9a8faa;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* ── invite code card ── */
+        .invite-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.09);
+            padding: 28px 32px;
+            margin-bottom: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .invite-card .label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #9a8faa;
+            margin-bottom: 6px;
+        }
+        .invite-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #2c3e7a;
+            background: #f0eef8;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px dashed #c0b8e0;
+            cursor: pointer;
+            transition: background .2s;
+            user-select: all;
+        }
+        .invite-code:hover { background: #e4e0f5; }
+        .copy-hint {
+            font-size: 11px;
+            color: #b0a8c0;
+            margin-top: 6px;
+            font-weight: 300;
+        }
+
+        /* Admin-only badge */
+        .admin-badge {
+            background: linear-gradient(135deg,#2c3e7a,#4a6fa5);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        /* ── action cards grid ── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.09);
+            padding: 28px 28px 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform .2s, box-shadow .2s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(44,32,64,0.14);
+        }
+
+        .action-icon { font-size: 32px; }
+
+        .action-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c2040;
+        }
+        .action-card p {
+            font-size: 13px;
+            color: #9a8faa;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .action-card .arrow {
+            margin-top: auto;
+            font-size: 18px;
+            color: #c0b8e0;
+        }
+
+        /* ── logout ── */
+        .logout-row {
+            text-align: center;
+            margin-top: 48px;
+        }
+
+        /* ── copy toast ── */
+        .toast {
+            position: fixed;
+            bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #2c2040;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all .3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-brand">🌳 FamilyTree</span>
+    <div class="nav-right">
+
+        
+       <a href="{% url 'account_settings' %}" style="text-decoration:none;" class="user-chip">
+    👤 {{ request.user.username }}
+</a>
+
+        {% if is_admin %}
+            <span class="admin-badge">Admin</span>
+        {% endif %}
+        <a href="{% url 'logout' %}" class="btn btn-secondary">Sign Out</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="welcome">
+        <h1>{{ family.name }}</h1>
+        <p>Welcome back, {{ request.user.username }}</p>
+    </div>
+
+    <!-- Invite Code (admin sees it, members see read-only) -->
+    <div class="invite-card">
+        <div>
+            <p class="label">Family Invite Code</p>
+            <div class="invite-code" onclick="copyCode()" title="Click to copy">
+                {{ invite_code }}
+            </div>
+            <p class="copy-hint">Share this code with family members so they can join.</p>
+        </div>
+        {% if is_admin %}
+            <span class="admin-badge">You are the Admin</span>
+        {% endif %}
+    </div>
+
+    <!-- Action cards -->
+    <div class="grid">
+
+        <a href="{% url 'treeView' %}" class="action-card">
+            <div class="action-icon">🌳</div>
+            <h3>View Family Tree</h3>
+            <p>See your full family tree with all connections and relationships.</p>
+            <span class="arrow">→</span>
+        </a>
+
+        <a href="{% url 'addNew' %}" class="action-card">
+            <div class="action-icon">➕</div>
+            <h3>Add Family Member</h3>
+            <p>Add a new person to the family with their details and parents.</p>
+            <span class="arrow">→</span>
+        </a>
+
+        <a href="{% url 'addRelationship' %}" class="action-card">
+            <div class="action-icon">❤️</div>
+            <h3>Add Marriage</h3>
+            <p>Record a marriage between two family members.</p>
+            <span class="arrow">→</span>
+        </a>
+
+        <a href="{% url 'marriages_list' %}" class="action-card">
+            <div class="action-icon">💍</div>
+            <h3>Marriage Records</h3>
+            <p>View, edit and manage all marriage records in your family.</p>
+            <span class="arrow">→</span>
+        </a>
+
+        <a href="{% url 'family_members' %}" class="action-card">
+            <div class="action-icon">👥</div>
+            <h3>All Members</h3>
+            <p>View and manage all persons in your family with full details.</p>
+            <span class="arrow">→</span>
+        </a>
+
+
+
+        {% if is_admin %}
+        <div class="action-card" style="border: 2px solid #fca5a5; cursor:default;">
+            <div class="action-icon">🛡️</div>
+            <h3>Admin Controls</h3>
+            <p>As the family admin, you can delete members from the tree view. Other members cannot delete anyone.</p>
+            <span class="arrow" style="color:#fca5a5;">Admin only</span>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="logout-row">
+        <a href="{% url 'logout' %}" class="btn btn-danger">Sign Out</a>
+    </div>
+
+</div>
+
+<div class="toast" id="toast">✅ Invite code copied!</div>
+
+<script>
+function copyCode() {
+    const code = '{{ invite_code }}';
+    navigator.clipboard.writeText(code).then(() => {
+        const t = document.getElementById('toast');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    });
+}
+</script>
+
+</body>
+</html>

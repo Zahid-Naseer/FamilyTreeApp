@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marriages — {{ family.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --male:   linear-gradient(135deg, #2c3e7a, #4a6fa5);
+            --female: linear-gradient(135deg, #7a2c5a, #c06090);
+            --bg:     #f0eef8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 900px; margin: 0 auto 36px;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .btn {
+            display: inline-block; padding: 9px 20px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; text-decoration: none;
+            transition: opacity .2s, transform .15s; border: none; cursor: pointer;
+        }
+        .btn:hover { opacity:.85; transform:translateY(-1px); }
+        .btn-primary { background: var(--male); color: white; }
+        .btn-outline  { background: white; color: #4a6fa5; border: 2px solid #4a6fa5; }
+        .btn-danger   { background: linear-gradient(135deg,#7a2c2c,#c05050); color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 11px; }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center; font-size: 2rem;
+            color: #2c2040; margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center; color: #9a8faa; font-size: 12px;
+            margin-bottom: 32px; font-weight: 300;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Stats */
+        .stat-row {
+            display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white; border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(44,32,64,0.08);
+            padding: 20px 28px; text-align: center; flex: 1; min-width: 120px;
+        }
+        .stat-card .num {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; color: #7a2c5a; font-weight: 700;
+        }
+        .stat-card .label {
+            font-size: 11px; color: #9a8faa; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase; margin-top: 4px;
+        }
+
+        /* Search */
+        .filter-bar {
+            background: white; border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(44,32,64,0.08);
+            padding: 16px 22px; margin-bottom: 20px;
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-bar input {
+            flex: 1; min-width: 200px;
+            padding: 10px 14px; border: 2px solid #ede9f5;
+            border-radius: 8px; font-size: 14px;
+            font-family: 'Lato', sans-serif; outline: none;
+            transition: border-color .2s;
+        }
+        .filter-bar input:focus { border-color: #7a2c5a; }
+
+        /* Cards grid */
+        .marriages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 16px;
+        }
+
+        .marriage-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.08);
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: box-shadow .2s;
+        }
+        .marriage-card:hover { box-shadow: 0 8px 30px rgba(44,32,64,0.13); }
+
+        .couple-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .spouse-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 30px;
+            font-size: 13px; font-weight: 700; color: white;
+            text-decoration: none;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .spouse-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .spouse-chip.male   { background: var(--male); }
+        .spouse-chip.female { background: var(--female); }
+
+        .heart-icon {
+            font-size: 18px; flex-shrink: 0;
+        }
+
+        .marriage-meta {
+            display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 8px;
+        }
+
+        .marriage-date {
+            font-size: 12px; color: #9a8faa; font-weight: 300;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        .managed-badge {
+            font-size: 11px; font-weight: 700;
+            color: #16a34a; background: #f0fdf4;
+            border: 1px solid #86efac;
+            padding: 3px 10px; border-radius: 20px;
+        }
+
+        .card-actions { display: flex; gap: 8px; }
+
+        .empty-state {
+            text-align: center; color: #aaa;
+            font-size: 15px; padding: 60px 20px;
+            background: white; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(44,32,64,0.08);
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="{% url 'base' %}" class="btn btn-outline">← Home</a>
+    <a href="{% url 'addRelationship' %}" class="btn btn-primary">❤️ Add Marriage</a>
+</div>
+
+<h1>{{ family.name }}</h1>
+<p class="subtitle">Marriage Records</p>
+
+<div class="container">
+
+    <!-- Stats -->
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="num">{{ marriages.count }}</div>
+            <div class="label">Total Marriages</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ marriages|length }}</div>
+            <div class="label">Records</div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="🔍  Search by name...">
+    </div>
+
+    <!-- Cards -->
+    {% if marriages %}
+    <div class="marriages-grid" id="marriagesGrid">
+        {% for marriage in marriages %}
+
+        <div class="marriage-card"
+             data-names="{{ marriage.spouse1.name|lower }} {{ marriage.spouse2.name|lower }}">
+
+            <div class="couple-display">
+                {% if marriage.spouse1.gender == 'M' %}
+                    <a href="{% url 'person_detail' marriage.spouse1.pk %}"
+                       class="spouse-chip male">👨 {{ marriage.spouse1.name }}</a>
+                    <span class="heart-icon">❤️</span>
+                    <a href="{% url 'person_detail' marriage.spouse2.pk %}"
+                       class="spouse-chip female">👩 {{ marriage.spouse2.name }}</a>
+                {% else %}
+                    <a href="{% url 'person_detail' marriage.spouse2.pk %}"
+                       class="spouse-chip male">👨 {{ marriage.spouse2.name }}</a>
+                    <span class="heart-icon">❤️</span>
+                    <a href="{% url 'person_detail' marriage.spouse1.pk %}"
+                       class="spouse-chip female">👩 {{ marriage.spouse1.name }}</a>
+                {% endif %}
+            </div>
+
+            <div class="marriage-meta">
+                <div class="marriage-date">
+                    {% if marriage.marriage_date %}
+                        💍 Married {{ marriage.marriage_date|date:"d M Y" }}
+                    {% else %}
+                        💍 Date not recorded
+                    {% endif %}
+                </div>
+                {% if marriage.spouse1.claimed_by or marriage.spouse2.claimed_by %}
+                    <span class="managed-badge">🔒 Managed</span>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            {% if marriage.spouse1.claimed_by == request.user or marriage.spouse2.claimed_by == request.user %}
+                <div class="card-actions">
+                    <a href="{% url 'edit_marriage' marriage.pk %}"
+                       class="btn btn-outline btn-sm">✏️ Edit Date</a>
+                    <a href="{% url 'delete_marriage' marriage.pk %}"
+                       class="btn btn-danger btn-sm">🗑 Delete</a>
+                </div>
+            {% elif is_admin and not marriage.spouse1.claimed_by and not marriage.spouse2.claimed_by %}
+                <div class="card-actions">
+                    <a href="{% url 'edit_marriage' marriage.pk %}"
+                       class="btn btn-outline btn-sm">✏️ Edit Date</a>
+                    <a href="{% url 'delete_marriage' marriage.pk %}"
+                       class="btn btn-danger btn-sm">🗑 Delete</a>
+                </div>
+            {% else %}
+                <div style="font-size:12px; color:#b0a8c0; font-style:italic;">
+                    Managed by the spouses
+                </div>
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        No marriages recorded yet.
+        <a href="{% url 'addRelationship' %}" style="color:#7a2c5a;">Add one →</a>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.marriage-card').forEach(card => {
+        card.style.display = card.dataset.names.includes(q) ? '' : 'none';
+    });
+});
+</script>
+</body>
+</html>
